@@ -52,7 +52,6 @@ Creates final itinerary
 
 This autonomous decision-making is the core of Agentic AI.
 
-Architecture of Your Project
                 ┌────────────────────┐
                 │   Streamlit UI     │
                 └─────────┬──────────┘
@@ -83,7 +82,11 @@ Architecture of Your Project
 
               ▼
      Final Travel Itinerary
+
+     
 Technologies Used
+
+
 Frontend
 Streamlit
 
