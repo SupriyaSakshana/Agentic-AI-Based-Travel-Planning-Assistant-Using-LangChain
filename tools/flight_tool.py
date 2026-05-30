@@ -2,21 +2,27 @@ import json
 
 def search_flights(query):
 
-    # -----------------------------
+    # -----------------------------------
     # HANDLE DICTIONARY INPUT
-    # -----------------------------
-    
+    # -----------------------------------
+
     if isinstance(query, dict):
 
         source = query.get("source_city", "")
         destination = query.get("destination_city", "")
-        date = query.get("travel_date", "")
-        preference = query.get("flight_preference", "")
 
-    # -----------------------------
+        # Handle multiple possible keys
+        date = query.get("travel_date", query.get("date", "Not Provided"))
+
+        preference = query.get(
+            "flight_preference",
+            query.get("preference", "Cheapest")
+        )
+
+    # -----------------------------------
     # HANDLE STRING INPUT
     # Example: "Delhi to Goa"
-    # -----------------------------
+    # -----------------------------------
 
     elif isinstance(query, str):
 
@@ -34,28 +40,75 @@ def search_flights(query):
     else:
         return "Invalid flight input format."
 
-
-    # -----------------------------
+    # -----------------------------------
     # VALIDATION
-    # -----------------------------
+    # -----------------------------------
 
     if not source or not destination:
         return "Please provide source and destination."
 
+    # -----------------------------------
+    # LOAD FLIGHTS DATA
+    # -----------------------------------
 
-    # -----------------------------
-    # RETURN RESPONSE
-    # -----------------------------
+    with open("data/flights.json", "r") as file:
+        flights = json.load(file)
 
-    return f"""
-    ✈ Flights Found
+    matched_flights = []
 
-    Source: {source}
-    Destination: {destination}
-    Date: {date}
-    Preference: {preference}
+    # -----------------------------------
+    # FIND MATCHING FLIGHTS
+    # -----------------------------------
 
-    1. IndiGo - ₹4500
-    2. Air India - ₹5200
-    3. Vistara - ₹6100
-    """
+    for flight in flights:
+
+        if (
+            flight["from"].lower() == source.lower()
+            and
+            flight["to"].lower() == destination.lower()
+        ):
+
+            matched_flights.append(flight)
+
+    # -----------------------------------
+    # NO FLIGHTS FOUND
+    # -----------------------------------
+
+    if not matched_flights:
+        return f"No flights found from {source} to {destination}."
+
+    # -----------------------------------
+    # SORT BY PRICE
+    # -----------------------------------
+
+    matched_flights = sorted(
+        matched_flights,
+        key=lambda x: x["price"]
+    )
+
+    # -----------------------------------
+    # BUILD RESPONSE
+    # -----------------------------------
+
+    result = f"""
+✈ Flights Found
+
+Source: {source}
+Destination: {destination}
+Date: {date}
+Preference: {preference}
+
+"""
+
+    for i, flight in enumerate(matched_flights[:5], start=1):
+
+        result += f"""
+{i}. {flight['airline']}
+   Flight ID: {flight['flight_id']}
+   Price: ₹{flight['price']}
+   Departure: {flight['departure_time']}
+   Arrival: {flight['arrival_time']}
+
+"""
+
+    return result

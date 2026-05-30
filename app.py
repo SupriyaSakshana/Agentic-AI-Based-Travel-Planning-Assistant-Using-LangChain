@@ -261,4 +261,4 @@ if st.button("🚀 Generate AI Travel Plan"):
             data=result,
             file_name="travel_itinerary.txt",
             mime="text/plain"
-        )
+        )   
